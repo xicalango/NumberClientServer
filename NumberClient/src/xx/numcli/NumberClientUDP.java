@@ -50,12 +50,13 @@ public class NumberClientUDP implements Runnable {
 				DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 6502);
 				
 				destinationSocket.send(packet);
+				Thread.sleep(0);
 			}
 			
 			
 			destinationSocket.close();
 			
-		} catch ( IOException e) {
+		} catch ( IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -70,6 +71,14 @@ public class NumberClientUDP implements Runnable {
 		
 		for( int i = 0; i < 24; i++ ) {
 			NumberClientUDP nc = new NumberClientUDP(i);
+			
+			try {
+				Thread.sleep(0);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			nc.start();
 			ncs.add(nc);
 		}

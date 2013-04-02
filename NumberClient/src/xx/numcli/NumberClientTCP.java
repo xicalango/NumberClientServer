@@ -1,5 +1,6 @@
 package xx.numcli;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,12 +47,13 @@ public class NumberClientTCP implements Runnable {
 				buf[1] = (byte)i;
 				
 				os.write(buf);
+				Thread.sleep(50);
 			}
 			
 			
 			destinationSocket.close();
 			
-		} catch ( IOException e) {
+		} catch ( IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -66,6 +68,14 @@ public class NumberClientTCP implements Runnable {
 		
 		for( int i = 0; i < 24; i++ ) {
 			NumberClientTCP nc = new NumberClientTCP(i);
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			nc.start();
 			ncs.add(nc);
 		}
