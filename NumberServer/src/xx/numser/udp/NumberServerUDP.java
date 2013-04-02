@@ -3,17 +3,16 @@ package xx.numser.udp;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketException;
-import java.util.Arrays;
 import java.util.Properties;
 
+import xx.numser.DataHandler;
 import xx.numser.ServerRunner;
 import xx.numser.ServerSocketFactory;
-import xx.numser.StartStoppable;
 import xx.numser.UDPServerSocketFactory;
 
 public class NumberServerUDP extends ServerRunner<DatagramSocket> {
 
+	
 	public NumberServerUDP(Properties serverStartProperties) {
 		super(serverStartProperties);
 	}
@@ -35,7 +34,7 @@ public class NumberServerUDP extends ServerRunner<DatagramSocket> {
 		
 		serverSocket.receive(packet);
 		
-		System.out.println(Arrays.toString(packet.getData()));
+		getHandler().dataReceived(null, packet.getData());
 	}
 	
 }

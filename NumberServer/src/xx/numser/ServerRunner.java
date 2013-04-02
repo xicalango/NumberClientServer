@@ -12,6 +12,16 @@ public abstract class ServerRunner<T> implements StartStoppable, Runnable {
 	
 	private Properties serverStartProperties;
 	
+	private DataHandler handler;
+	
+	public DataHandler getHandler() {
+		return handler;
+	}
+
+	public void setHandler(DataHandler handler) {
+		this.handler = handler;
+	}
+
 	public ServerRunner(Properties serverStartProperties) {
 		this.serverStartProperties = serverStartProperties;
 	}
@@ -38,7 +48,8 @@ public abstract class ServerRunner<T> implements StartStoppable, Runnable {
 	public void stop() {
 		
 		running = false;
-		serverThread.interrupt();
+		if(serverThread != null)
+			serverThread.interrupt();
 		
 		try {
 			getServerSocketFactory().close(socket);
@@ -83,5 +94,9 @@ public abstract class ServerRunner<T> implements StartStoppable, Runnable {
 		return true;
 	}
 	protected void onDeinitialize() { }
+
+	public boolean isRunning() {
+		return running;
+	}
 	
 }

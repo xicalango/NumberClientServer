@@ -1,11 +1,13 @@
 package xx.numser.tcp;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import xx.numser.DataHandler;
 import xx.numser.StartStoppable;
 
 public class ClientHandleThread implements Runnable, StartStoppable {
@@ -17,8 +19,11 @@ public class ClientHandleThread implements Runnable, StartStoppable {
 	private boolean running = false;
 	private InputStream clientInputStream;
 	
-	public ClientHandleThread(Socket clientSocket) {
+	private DataHandler handler;
+	
+	public ClientHandleThread(Socket clientSocket, DataHandler handler) {
 		this.clientSocket = clientSocket;
+		this.handler = handler;
 		
 		LOGGER.info("ClientThread created for: " + clientSocket);
 	}
@@ -39,17 +44,25 @@ public class ClientHandleThread implements Runnable, StartStoppable {
 			e1.printStackTrace();
 			stop();
 		}
+		
+		DataInputStream dis = new DataInputStream(clientInputStream);
 
 		while(running) {
 			byte[] buf = new byte[2];
+			
 			int value;
 			try {
+				
 				value = clientInputStream.read(buf);
-				System.out.println("Client " + clientSocket + ": "+ Arrays.toString(buf));
+				
+				handler.dataReceived(clientSocket, buf);
 				
 				if(value == -1) {
 					LOGGER.info("Client " + clientSocket + " departed");
 					stop();
+				}
+				else {
+					
 				}
 				
 			} catch (IOException e) {

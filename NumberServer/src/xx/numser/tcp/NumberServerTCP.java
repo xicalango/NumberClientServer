@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import xx.numser.DataHandler;
 import xx.numser.ServerRunner;
 import xx.numser.ServerSocketFactory;
 import xx.numser.TCPServerSocketFactory;
@@ -20,13 +21,14 @@ public class NumberServerTCP extends ServerRunner<ServerSocket>{
 		super(serverStartProperties);
 	}
 
+
 	@Override
 	protected void doMainLoop(ServerSocket serverSocket)
 			throws InterruptedException, IOException {
 		
 		Socket clientSocket = serverSocket.accept();
 		
-		ClientHandleThread newClientThread = new ClientHandleThread(clientSocket);
+		ClientHandleThread newClientThread = new ClientHandleThread(clientSocket, getHandler());
 		newClientThread.start();
 		clients.add( newClientThread );
 	}
