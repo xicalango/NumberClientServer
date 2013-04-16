@@ -17,7 +17,7 @@ public class TCPServerAdapter extends ServerAdapter<ServerSocket> {
 	@Override
 	protected ServerRunner<ServerSocket> createServer(
 			Properties serverStartProperties) {
-		return new NumberServerTCP(serverStartProperties);
+		return new NumberServerTCP(Integer.valueOf(serverStartProperties.getProperty("port","6502")));
 	}
 	
 	

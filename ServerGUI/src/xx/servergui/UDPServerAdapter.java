@@ -16,7 +16,7 @@ public class UDPServerAdapter extends ServerAdapter<DatagramSocket> {
 	@Override
 	protected ServerRunner<DatagramSocket> createServer(
 			Properties serverStartProperties) {
-		return new NumberServerUDP(serverStartProperties);
+		return new NumberServerUDP(Integer.valueOf(serverStartProperties.getProperty("port","6502")));
 	}
 
 
