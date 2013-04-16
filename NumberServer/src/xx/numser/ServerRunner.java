@@ -1,19 +1,20 @@
 package xx.numser;
 
 import java.io.IOException;
-import java.util.Properties;
 
 public abstract class ServerRunner<T> implements StartStoppable, Runnable {
 
-	private T socket;
+	private T serverSocket;
 	
 	private boolean running = false;
 	private Thread serverThread;
-	
-	private Properties serverStartProperties;
-	
+	private int port;
 	private DataHandler handler;
 	
+	public ServerRunner(int port) {
+		this.port = port;
+	}
+
 	public DataHandler getHandler() {
 		return handler;
 	}
@@ -21,44 +22,28 @@ public abstract class ServerRunner<T> implements StartStoppable, Runnable {
 	public void setHandler(DataHandler handler) {
 		this.handler = handler;
 	}
+	
+	protected abstract T openSocket(int port) throws IOException;
+	protected abstract void handleServerSocket(T serverSocket) throws InterruptedException, IOException;
+	protected abstract void closeSocket(T socket) throws IOException;
 
-	public ServerRunner(Properties serverStartProperties) {
-		this.serverStartProperties = serverStartProperties;
-	}
-	
-	public abstract ServerSocketFactory<T> getServerSocketFactory();
-	
 	@Override
 	public void start() {
+		if(running)
+			return;
+		
 		try {
-			socket = getServerSocketFactory().openSocket(Integer.valueOf(serverStartProperties.getProperty("port")));
+			serverSocket = openSocket(port);
 			
-			serverThread = new Thread(this, "ServerThread");
+			serverThread = new Thread(this, "ServerThread Port " + port);
 			serverThread.start();
-			
-			
-		} catch (NumberFormatException | IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 	}
 	
-	@Override
-	public void stop() {
-		
-		running = false;
-		if(serverThread != null)
-			serverThread.interrupt();
-		
-		try {
-			getServerSocketFactory().close(socket);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+
 	
 	
 	@Override
@@ -73,22 +58,37 @@ public abstract class ServerRunner<T> implements StartStoppable, Runnable {
 		while(running) {
 			
 			try {
-				doMainLoop(socket);
+				handleServerSocket(serverSocket);
 			} catch (InterruptedException | IOException e) {
 				e.printStackTrace();
 				
 				stop();
 			}
-			
 		}
 		
 		stop();
-		
-		onDeinitialize();
 	}
 
 
-	protected abstract void doMainLoop(T serverSocket) throws InterruptedException, IOException;
+	@Override
+	public void stop() {
+		onDeinitialize();
+
+		if(!running)
+			return;
+		
+		running = false;
+		
+		if(serverThread != null)
+			serverThread.interrupt();
+		
+		try {
+			closeSocket(serverSocket);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
 
 	protected boolean onInitialize() {
 		return true;

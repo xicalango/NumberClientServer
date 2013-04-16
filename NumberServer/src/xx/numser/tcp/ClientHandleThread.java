@@ -1,10 +1,8 @@
 package xx.numser.tcp;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import xx.numser.DataHandler;
@@ -43,26 +41,23 @@ public class ClientHandleThread implements Runnable, StartStoppable {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			stop();
+			return;
 		}
 		
-		DataInputStream dis = new DataInputStream(clientInputStream);
-
 		while(running) {
 			byte[] buf = new byte[2];
 			
-			int value;
+			int readBytes;
 			try {
 				
-				value = clientInputStream.read(buf);
+				readBytes = clientInputStream.read(buf);
 				
-				handler.dataReceived(clientSocket, buf);
-				
-				if(value == -1) {
+				if(readBytes == -1) {
 					LOGGER.info("Client " + clientSocket + " departed");
 					stop();
 				}
 				else {
-					
+					handler.dataReceived(clientSocket, buf);
 				}
 				
 			} catch (IOException e) {

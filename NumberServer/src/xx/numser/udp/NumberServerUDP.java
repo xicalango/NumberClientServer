@@ -3,29 +3,22 @@ package xx.numser.udp;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.Properties;
 
-import xx.numser.DataHandler;
 import xx.numser.ServerRunner;
-import xx.numser.ServerSocketFactory;
-import xx.numser.UDPServerSocketFactory;
 
 public class NumberServerUDP extends ServerRunner<DatagramSocket> {
 
-	
-	public NumberServerUDP(Properties serverStartProperties) {
-		super(serverStartProperties);
+	public NumberServerUDP(int port) {
+		super(port);
 	}
-
-	private ServerSocketFactory<DatagramSocket> serverSocketFactory = new UDPServerSocketFactory();
 	
 	@Override
-	public ServerSocketFactory<DatagramSocket> getServerSocketFactory() {
-		return serverSocketFactory;
+	protected DatagramSocket openSocket(int port) throws IOException {
+		return new DatagramSocket(port);
 	}
 
 	@Override
-	protected void doMainLoop(DatagramSocket serverSocket)
+	protected void handleServerSocket(DatagramSocket serverSocket)
 			throws InterruptedException, IOException {
 		
 		byte[] buf = new byte[2];
@@ -35,6 +28,11 @@ public class NumberServerUDP extends ServerRunner<DatagramSocket> {
 		serverSocket.receive(packet);
 		
 		getHandler().dataReceived(null, packet.getData());
+	}
+
+	@Override
+	protected void closeSocket(DatagramSocket socket) throws IOException {
+		socket.close();
 	}
 	
 }
